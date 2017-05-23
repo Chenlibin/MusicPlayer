@@ -114,6 +114,12 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+                int seekPosition = seekBar.getProgress();
+                Intent progressIntent = new Intent(Config.ACTION_CURRENT_PLAY);
+                progressIntent.putExtra(Config.EXTRA_PLAY_SETTING,seekPosition);
+                localBroadcastManager.sendBroadcast(progressIntent);
+
+
             }
         });
 
@@ -163,7 +169,6 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
                     isPlaying = true;
                 }
                 localBroadcastManager.sendBroadcast(playOrStop);
-
                 break;
             case R.id.show_previous:
 
@@ -212,6 +217,8 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
             }
         }
     }
+
+    SimpleDateFormat format = new SimpleDateFormat("mm:ss");
     //与service交互的数据
     class ServiceReceiver extends BroadcastReceiver{
 
@@ -223,23 +230,15 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
                 int max = intent.getIntExtra(Config.EXTRA_PROGRESS_MAX,0);
                 int current = intent.getIntExtra(Config.EXTRA_PROGRESS_CURRENT,0);
 
-                SimpleDateFormat format = new SimpleDateFormat("mm:ss");
                 String max_time = format.format(max);
                 String current_time = format.format(current);
 
                 maxTv.setText(max_time);
                 currentTv.setText(current_time);
 
-                Log.e("current_time",current_time + "");
-                Log.e("current",current + "");
-                Log.e("max_time",max_time + "");
-                Log.e("max",max + "");
-
                 progressBar.setMax(max);
                 progressBar.setProgress(current);
 
-//                progressBar.setMax(intent.getIntExtra(Config.EXTRA_PROGRESS_MAX,0));
-//                progressBar.setProgress(intent.getIntExtra(Config.EXTRA_PROGRESS_CURRENT,0));
 
             }
         }
