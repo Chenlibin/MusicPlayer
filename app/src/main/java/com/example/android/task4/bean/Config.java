@@ -24,14 +24,12 @@ public class Config {
      * 某个电台下的歌曲列表   第二步，获得第一步中的"ch_name"
      */
 
-//    public static final String RADIO_SING_LIST = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=qianqian&version=2.1.0&method=baidu.ting.radio.getChannelSong&format=json&rn=50&channelname=";
-    public static final String RADIO_SING_LIST = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=qianqian&version=2.1.0&method=baidu.ting.radio.getChannelSong&format=json&rn=50&channelname=public_tuijian_billboard";
+    public static final String RADIO_SING_LIST = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=qianqian&version=2.1.0&method=baidu.ting.radio.getChannelSong&format=json&rn=50&channelname=";
 
     /**
      * 通过歌曲的Id查找歌曲的详情       播放第二步中的songId
      */
     public static final String SING_URL = "http://ting.baidu.com/data/music/links?songIds=";
-//    public static final String SING_URL = "http://ting.baidu.com/data/music/links?songIds=5489769";
     /**
      * 当前播放的音乐
      */
@@ -51,6 +49,7 @@ public class Config {
     public static final String ACTION_STOP_OR_START_SONG = "action_stop_or_start_song";
     public static final String ACTION_PLAY_LOCAL = "action_play_local";
     public static final String ACTION_REFLSH_DOWNLOAD = "action_refash_download";
+    public static final String ACTION_FIRST_PLAY = "action_first_play";
     //通知播放界面更改图标
     public static final String ACTION_REFLASH = "reflashUI";
 

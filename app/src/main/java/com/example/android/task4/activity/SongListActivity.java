@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.example.android.task4.R;
 import com.example.android.task4.adapter.SongListAdapter;
+import com.example.android.task4.bean.Config;
 import com.example.android.task4.bean.Sing;
 import com.example.android.task4.bean.SingMessage;
 import com.example.android.task4.utils.Http;
@@ -23,6 +24,7 @@ import com.example.android.task4.utils.SongJson;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,13 +56,11 @@ public class SongListActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.song_list);
 
-        String path = "http://tingapi.ting.baidu.com/v1/restserver/ting?from=qianqian&version=2.1.0&method=baidu.ting.radio.getChannelSong&format=json&rn=50&channelname=";
-
         Intent intent = getIntent();
         String ch_name = intent.getStringExtra("ch_name");
         String songlistTitle = intent.getStringExtra("songlistTitle");
 
-        songListPath = path + ch_name;
+        songListPath = Config.RADIO_SING_LIST + ch_name;
 
 //        Log.e("path",songListPath);
 
@@ -102,11 +102,8 @@ public class SongListActivity extends Activity {
 
                                 String songId = sing.getSongid();
 
-
                                 Intent intent = new Intent();
                                 intent.putExtra("songId",songId);
-                                intent.putExtra("songArtist",sing.getSongArtist());
-                                intent.putExtra("songTitle",sing.getSongTitle());
                                 intent.setClass(SongListActivity.this,PlayShowActivity.class);
                                 startActivity(intent);
                             }

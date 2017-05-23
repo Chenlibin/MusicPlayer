@@ -27,15 +27,13 @@ public class MyBindService extends Service {
 
     //播放
     private MediaPlayer mediaPlayer;
-    private PlayReceiver receiver;
-
-    //播放地址
-    private String songPath;
-    private String showLink;
 
     //App内广播
     private LocalBroadcastManager localBroadcastManager;
     private PlayReceiver playReceiver;
+
+    //播放地址
+    private String showLink;
 
     @Nullable
     @Override
@@ -56,66 +54,39 @@ public class MyBindService extends Service {
         IntentFilter intentFilter = new IntentFilter();
 
         intentFilter.addAction(Config.ACTION_STOP_OR_START_SONG);
-        intentFilter.addAction(Config.ACTION_CHANGE_SONG);
+//        intentFilter.addAction(Config.ACTION_CHANGE_SONG);
+//        intentFilter.addAction(Config.ACTION_PLAY_LOCAL);
+        intentFilter.addAction(Config.ACTION_FIRST_PLAY);
+        intentFilter.addAction(Config.ACTION_CURRENT_PLAY);
 
         playReceiver = new PlayReceiver();
         localBroadcastManager.registerReceiver(playReceiver,intentFilter);
 
-
-
     }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        songPath = intent.getStringExtra("songPath");
-        Log.e("songPath StartCommand",songPath);
-
-        new PlayThread().start();
-
-
         return super.onStartCommand(intent, flags, startId);
     }
-
     @Override
     public void onDestroy() {
         Log.e("service","已经停止");
         mediaPlayer.stop();
-        mediaPlayer.reset();
+        mediaPlayer.release();
         localBroadcastManager.unregisterReceiver(playReceiver);
         super.onDestroy();
     }
 
     //播放和暂停
     public void play(){
-
-        Uri uri = Uri.parse(showLink);
-        try {
-            mediaPlayer.setDataSource(this,uri);
-            mediaPlayer.prepare();
+        if (mediaPlayer.isPlaying()){
+            mediaPlayer.pause();
+        } else {
             mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
+            new ProgressThread().start();
         }
 
-
-
-//        if (mediaPlayer.isPlaying()){
-//            mediaPlayer.pause();
-//        }else{
-//            mediaPlayer.start();
-//        }
-//        Uri uri = Uri.parse("http://yinyueshiting.baidu.com/data2/music/d3b63254a58afaf8bad7fef4afd16b5f/259024958/5489769205200128.mp3?xcode=8ea0e5e3a9f17b0ad1823dca873f4874");
-//        try {
-//            mediaPlayer.setDataSource(this,uri);
-//            mediaPlayer.prepare();
-//            mediaPlayer.start();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
     }
-
     //切换歌曲
     public void change(String uri,boolean isLocal){
 
@@ -139,6 +110,29 @@ public class MyBindService extends Service {
         }
     }
 
+    //进度条的进程
+    class ProgressThread extends Thread{
+        @Override
+        public void run() {
+            try {
+                while (mediaPlayer != null && mediaPlayer.isPlaying() ){
+                    //获取当前播放位置
+                    int currentPosition = mediaPlayer.getCurrentPosition();
+                    //歌曲总时长，单位毫秒
+                    int sumLen = mediaPlayer.getDuration();
+
+                    Intent intent = new Intent(Config.ACTION_PROGRES);
+                    intent.putExtra(Config.EXTRA_PROGRESS_MAX,sumLen);
+                    intent.putExtra(Config.EXTRA_PROGRESS_CURRENT,currentPosition);
+//                    Log.e("broadcast","is send");
+                    localBroadcastManager.sendBroadcast(intent);
+                }
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     //接受广播
     class PlayReceiver extends BroadcastReceiver{
@@ -149,45 +143,19 @@ public class MyBindService extends Service {
             if (action.equals(Config.ACTION_STOP_OR_START_SONG)){
                 play();
             } else if (action.equals(Config.ACTION_CHANGE_SONG)){
+//                String song = intent.getStringExtra("uri");
+//                change(song,true);
+            } else if (action.equals(Config.ACTION_CURRENT_PLAY)){
 
-                String song = intent.getStringExtra("uri");
-                change(song,false);
+                int setting_play = intent.getIntExtra(Config.EXTRA_PLAY_SETTING,0);
+                mediaPlayer.seekTo(setting_play);
 
+            } else if (action.equals(Config.ACTION_PLAY_LOCAL)){
+//                change(showLink,false);
+            } else{
+                showLink = intent.getStringExtra("showLink");
+                change(showLink,false);
             }
         }
     }
-
-
-    class PlayThread extends Thread{
-        @Override
-        public void run() {
-            if (songPath != null) {
-
-                byte[] arr ;
-
-                try {
-                    arr = Http.getData(songPath);
-                    String json = new String(arr,"utf-8");
-                    if (json != null) {
-
-                        Gson gson = new Gson();
-                        PlayBase playBase = gson.fromJson(json,PlayBase.class);
-
-                        showLink = playBase.getData().getSongList().get(0).getShowLink();
-                        Log.e("showLink",showLink);
-
-                        play();
-
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }
-    }
-
-
-
 }

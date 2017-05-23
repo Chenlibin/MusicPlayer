@@ -73,20 +73,20 @@ public class RecommendFragment extends BaseFragment {
         return ret;
     }
 
-//    @Override
-//    public void onResume() {
-//
-//        myThread = new MyThread();
-//        myThread.start();
-//
-//        //防止出现空指针异常
-//        while (null == myHandler){
-//        }
-//        //发送消息
-//        myThread.sengMessagetoDoWork();
-//
-//        super.onResume();
-//    }
+    @Override
+    public void onResume() {
+
+        myThread = new MyThread();
+        myThread.start();
+
+        //防止出现空指针异常
+        while (null == myHandler){
+        }
+        //发送消息
+        myThread.sengMessagetoDoWork();
+
+        super.onResume();
+    }
 
     @Override
     public String getFragmentTitle() {
@@ -182,10 +182,7 @@ public class RecommendFragment extends BaseFragment {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-
-
                                 SingMessage songList = list.get(position);
-
 
                                 Intent intent = new Intent();
                                 intent.putExtra("ch_name",songList.getCh_name());

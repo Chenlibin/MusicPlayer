@@ -7,7 +7,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.example.android.task4.R;
 import com.example.android.task4.adapter.MyFragmentPagerAdapter;
@@ -26,6 +28,12 @@ public class MainActivity extends FragmentActivity{
 
     private MyFragmentPagerAdapter adapter;
 
+    //启动服务
+    private Intent serviceIntent;
+
+    //关闭软件
+    private long mExitTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +41,9 @@ public class MainActivity extends FragmentActivity{
         setContentView(R.layout.main);
 
 
+        //启动服务
+        serviceIntent = new Intent(this, MyBindService.class);
+        startService(serviceIntent);
 
         List<Fragment> list = new ArrayList<Fragment>();
 
@@ -48,28 +59,30 @@ public class MainActivity extends FragmentActivity{
 
         mainTabLayout.setupWithViewPager(mainViewPager);
 
-//        connection = new ServiceConnection() {
-//            @Override       //当启动源跟Service成功连接之后将会自动调用这个方法
-//            public void onServiceConnected(ComponentName name, IBinder binder) {
-//                service = ((MyBindService.MyBinder)binder).getService();
-//            }
-//
-//            @Override       //当启动源跟Service连接意外丢失时调用此方法  比如崩溃或者被强行杀死
-//            public void onServiceDisconnected(ComponentName name) {
-//
-//            }
-//        };
-//
-//        intent = new Intent(MainActivity.this, MyBindService.class);
-//        bindService(intent,connection, Service.BIND_AUTO_CREATE);
-//
+
 
     }
 
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                mExitTime = System.currentTimeMillis();
+            } else {
+                finish();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     protected void onDestroy() {
+
+        stopService(serviceIntent);
+
         super.onDestroy();
     }
 
