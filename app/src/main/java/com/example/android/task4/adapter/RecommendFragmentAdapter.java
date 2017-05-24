@@ -49,7 +49,7 @@ public class RecommendFragmentAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View ret = null;
+        View ret;
 
         if (convertView != null) {
             ret = convertView;

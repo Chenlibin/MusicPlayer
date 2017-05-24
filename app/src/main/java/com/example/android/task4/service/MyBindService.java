@@ -53,8 +53,9 @@ public class MyBindService extends Service {
         localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
         IntentFilter intentFilter = new IntentFilter();
 
+        // TODO: 服务的广播
         intentFilter.addAction(Config.ACTION_STOP_OR_START_SONG);
-//        intentFilter.addAction(Config.ACTION_CHANGE_SONG);
+        intentFilter.addAction(Config.ACTION_CHANGE_SONG);
 //        intentFilter.addAction(Config.ACTION_PLAY_LOCAL);
         intentFilter.addAction(Config.ACTION_FIRST_PLAY);
         intentFilter.addAction(Config.ACTION_CURRENT_PLAY);
@@ -143,8 +144,8 @@ public class MyBindService extends Service {
             if (action.equals(Config.ACTION_STOP_OR_START_SONG)){
                 play();
             } else if (action.equals(Config.ACTION_CHANGE_SONG)){
-//                String song = intent.getStringExtra("uri");
-//                change(song,true);
+                String song = intent.getStringExtra("uri");
+                change(song,true);
             } else if (action.equals(Config.ACTION_CURRENT_PLAY)){
 
                 int setting_play = intent.getIntExtra(Config.EXTRA_PLAY_SETTING,0);
@@ -153,7 +154,7 @@ public class MyBindService extends Service {
             } else if (action.equals(Config.ACTION_PLAY_LOCAL)){
 //                change(showLink,false);
             } else{
-                showLink = intent.getStringExtra("showLink");
+                showLink = intent.getStringExtra("uri");
                 change(showLink,false);
             }
         }

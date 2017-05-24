@@ -54,12 +54,15 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
 
     //广播
     private ServiceReceiver serviceReceiver;
+    private int sendInt;
 
     //线程
     private PlayThread playThread;
 
     //当前是否播放
     boolean isPlaying;
+    //切换歌曲
+    private int currentSongPosition;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,10 +70,14 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.play_show);
 
         Intent dataIntent = getIntent();
+        //歌单中点击的id
         songId = dataIntent.getStringExtra("songId");
+        //歌曲的position,用于切换歌曲
+        currentSongPosition = dataIntent.getIntExtra("position",0);
+
         //播放网址
         songPath = Config.SING_URL + songId;
-//        Log.e("songPath",songPath);
+        Log.e("songPath",songPath);
 
         song_artist = (TextView) findViewById(R.id.show_song_artist);
         song_title = (TextView) findViewById(R.id.show_song_title);
@@ -82,9 +89,10 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
         currentTv = (TextView) findViewById(R.id.show_current_progress);
         maxTv = (TextView) findViewById(R.id.show_max_progress);
 
-        //app广播
+        //app内广播
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         //获得网络数据和解析
+        sendInt = 1;
         playThread = new PlayThread();
         playThread.start();
         //监听按钮
@@ -172,14 +180,36 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.show_previous:
 
+
+                if (SongListActivity.idList != null) {
+                    currentSongPosition = currentSongPosition - 1 ;
+                    songId = (String) SongListActivity.idList.get(currentSongPosition);
+                    songPath = Config.SING_URL + songId;
+//                Log.e("nextId",songId);
+                    sendInt = 2;
+                    playThread = new PlayThread();
+                    playThread.start();
+                }
+
                 break;
             case R.id.show_next:
+                // TODO: 下一首
+                if (SongListActivity.idList != null) {
+                    currentSongPosition = currentSongPosition + 1 ;
+                    songId = (String) SongListActivity.idList.get(currentSongPosition);
+                    songPath = Config.SING_URL + songId;
+//                Log.e("nextId",songId);
+                    sendInt = 2;
+                    playThread = new PlayThread();
+                    playThread.start();
+                }
 
+                break;
+            default:
 
                 break;
         }
     }
-
 
     //子线程获得数据
     class PlayThread extends Thread{
@@ -199,16 +229,27 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
 
                         String showLink = playBase.getData().getSongList().get(0).getShowLink();
 //                        Log.e("showLink",showLink);
-
-                        //广播带数据给service
-                        Intent startPlay = new Intent(Config.ACTION_FIRST_PLAY);
-                        startPlay.putExtra("showLink",showLink);
-                        isPlaying = true;
-                        localBroadcastManager.sendBroadcast(startPlay);
-
+                        //向服务发送广播
+                        switch (sendInt){
+                            case 1:
+                                Intent startPlay = new Intent(Config.ACTION_FIRST_PLAY);
+                                startPlay.putExtra("uri",showLink);
+                                isPlaying = true;
+                                localBroadcastManager.sendBroadcast(startPlay);
+                                break;
+                            case 2:
+                                Intent change = new Intent(Config.ACTION_CHANGE_SONG);
+                                change.putExtra("uri",showLink);
+                                isPlaying = true;
+                                localBroadcastManager.sendBroadcast(change);
+                                break;
+                            default:
+                                break;
+                        }
                         Message mainMsg = mainHandler.obtainMessage();
                         mainMsg.obj = playBase;
                         mainHandler.sendMessage(mainMsg);
+
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -238,7 +279,6 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
 
                 progressBar.setMax(max);
                 progressBar.setProgress(current);
-
 
             }
         }

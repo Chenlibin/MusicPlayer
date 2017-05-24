@@ -16,12 +16,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.android.task4.R;
+import com.example.android.task4.activity.PlayShowActivity;
 import com.example.android.task4.adapter.MyFragmentPagerAdapter;
 import com.example.android.task4.bean.Config;
+import com.example.android.task4.bean.PlayBase;
 import com.example.android.task4.fragment.firstFragment.FMFragment;
 import com.example.android.task4.fragment.firstFragment.RankingListFragment;
 import com.example.android.task4.fragment.firstFragment.RecommendFragment;
@@ -49,6 +52,7 @@ public class FirstFragment extends BaseFragment implements View.OnClickListener 
     private ImageButton playButton;
     private TextView text;
     private SeekBar musicProgress;      //可滑动的Progress
+    private LinearLayout musicLayout;
 
     public LocalBroadcastManager localBroadcastManager;
 
@@ -100,10 +104,12 @@ public class FirstFragment extends BaseFragment implements View.OnClickListener 
         playButton = (ImageButton) ret.findViewById(R.id.music_play);
         text = (TextView) ret.findViewById(R.id.music_text);
         musicProgress = (SeekBar) ret.findViewById(R.id.music_progress);
+        musicLayout = (LinearLayout) ret.findViewById(R.id.music_layout);
 
         //按钮的监听
         nextButton.setOnClickListener(this);
         playButton.setOnClickListener(this);
+        musicLayout.setOnClickListener(this);
 
         //启动线程
         myThread = new MyThread();
@@ -130,46 +136,6 @@ public class FirstFragment extends BaseFragment implements View.OnClickListener 
         return "首页";
     }
 
-//    //进度条
-//    private void even(){
-//        musicProgress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//                //TODO 拖动结束
-//                int seekPosition = seekBar.getProgress();
-//
-//                Intent intent = new Intent("current_paly");
-//                intent.putExtra("playsetting",seekPosition);
-//                broadcastManager.sendBroadcastSync(intent);
-//            }
-//        });
-//    }
-//
-//
-//    public int getItemId(){
-//        Sing sing = Config.SING;
-//
-//        List<Sing> l = Config.SONGLIST;
-//
-//        for (int i = 0; i < l.size(); i++) {
-//            Sing ss = l.get(i);
-//            if (ss.getSongid().equals(sing.getSongid())){
-//                return i;
-//            }
-//        }
-//
-//        return 0;
-//    }
-
-
     private class MyThread extends Thread{
         @Override
         public void run() {
@@ -187,14 +153,10 @@ public class FirstFragment extends BaseFragment implements View.OnClickListener 
                                 int id = 1;
                                 byte[] arr;
                                 try {
-//                                    Log.e("adress", songListPath);
                                     arr = Http.getData(listPath);
-//                                    Log.e("HttpAdress",arr+"");
                                     String json = new String(arr,"utf-8");
-//                                    Log.e("JsonData",json);
                                     if (json != null) {
                                         Config.SONGLIST = SongJson.parserSong(json,id);
-//                                        Log.e("listData",list+"");
                                     }
 
                                 } catch (IOException e) {
@@ -231,8 +193,6 @@ public class FirstFragment extends BaseFragment implements View.OnClickListener 
         switch (v.getId()){
             case R.id.music_play:
 
-
-
                 if (!isPlaying){
                     isPlaying = !isPlaying;
                     playButton.setImageResource(R.drawable.play_fm_btn_pause);
@@ -245,24 +205,14 @@ public class FirstFragment extends BaseFragment implements View.OnClickListener 
 
                 break;
             case R.id.music_next:
-//                int songId1 = getItemId();
-//                if (songId1 == Config.SONGLIST.size() -1 ){
-//                    songId1 = 0;
-//                } else {
-//                    songId1 = songId1 + 1;
-//                }
-//                Config.SING = Config.SONGLIST.get(songId1);
-//
-//                Intent intent1 = new Intent(Config.ACTION_CHANGE_SONG);
-//                intent1.putExtra("uri",Config.PLAY_URL);            //第一个是键名，第二个为对应的值
-//                localBroadcastManager.sendBroadcast(intent1);
 
+                break;
+            case R.id.music_layout:
+                Intent playShowIntent = new Intent();
+                playShowIntent.setClass(getActivity(), PlayShowActivity.class);
+                startActivity(playShowIntent);
 
                 break;
         }
     }
-
-
-
-
 }

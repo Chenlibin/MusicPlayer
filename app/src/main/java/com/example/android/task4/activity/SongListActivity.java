@@ -50,6 +50,8 @@ public class SongListActivity extends Activity {
     //数据
     List<Sing> list = null;
 
+    //id的集合
+    public static List idList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,12 +100,19 @@ public class SongListActivity extends Activity {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                                idList = new ArrayList();
+                                for (int i = 0; i < list.size(); i++) {
+                                    String idOfSong = list.get(i).getSongid();
+                                    idList.add(i,idOfSong);
+                                }
+
                                 Sing sing = list.get(position);
 
                                 String songId = sing.getSongid();
 
                                 Intent intent = new Intent();
                                 intent.putExtra("songId",songId);
+                                intent.putExtra("position",position);
                                 intent.setClass(SongListActivity.this,PlayShowActivity.class);
                                 startActivity(intent);
                             }
