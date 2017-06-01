@@ -64,13 +64,7 @@ public class FirstFragment extends BaseFragment implements View.OnClickListener 
     //当前播放状态
     private boolean isPlaying = false;
 
-    private Context context;
-
     public FirstFragment(){}
-
-    public FirstFragment(Context context) {
-        this.context = context;
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -88,7 +82,7 @@ public class FirstFragment extends BaseFragment implements View.OnClickListener 
 
         List<Fragment> firstList = new ArrayList<Fragment>();
 
-        firstList.add(new RecommendFragment(context,getFragmentManager()));
+        firstList.add(new RecommendFragment(getActivity(),getFragmentManager()));
         firstList.add(new SongListFragment());
         firstList.add(new FMFragment());
         firstList.add(new RankingListFragment());

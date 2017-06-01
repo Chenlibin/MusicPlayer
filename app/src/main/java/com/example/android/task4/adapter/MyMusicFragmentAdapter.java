@@ -39,6 +39,10 @@ public class MyMusicFragmentAdapter extends BaseAdapter {
 
     }
 
+    public void refresh(List<Sing> nList){
+        list = nList;
+        notifyDataSetChanged();
+    }
 
     @Override
     public int getCount() {

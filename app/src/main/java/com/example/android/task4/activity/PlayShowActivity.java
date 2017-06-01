@@ -181,9 +181,10 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
             case R.id.show_previous:
 
 
-                if (SongListActivity.idList != null) {
+                if (Config.CURRENT_LIST != null) {
                     currentSongPosition = currentSongPosition - 1 ;
-                    songId = (String) SongListActivity.idList.get(currentSongPosition);
+//                    songId = (String) SongListActivity.idList.get(currentSongPosition);
+                    songId  = (String) Config.CURRENT_LIST.get(currentSongPosition);
                     songPath = Config.SING_URL + songId;
 //                Log.e("nextId",songId);
                     sendInt = 2;
@@ -194,11 +195,12 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.show_next:
                 // TODO: 下一首
-                if (SongListActivity.idList != null) {
+                if (Config.CURRENT_LIST != null) {
                     currentSongPosition = currentSongPosition + 1 ;
-                    songId = (String) SongListActivity.idList.get(currentSongPosition);
+//                    songId = (String) SongListActivity.idList.get(currentSongPosition);
+                    songId  = (String) Config.CURRENT_LIST.get(currentSongPosition);
                     songPath = Config.SING_URL + songId;
-//                Log.e("nextId",songId);
+
                     sendInt = 2;
                     playThread = new PlayThread();
                     playThread.start();
@@ -279,6 +281,22 @@ public class PlayShowActivity extends Activity implements View.OnClickListener {
 
                 progressBar.setMax(max);
                 progressBar.setProgress(current);
+
+                if (max == current){
+                    if (Config.CURRENT_LIST != null) {
+                        if (currentSongPosition == Config.CURRENT_LIST.size()) {
+                            currentSongPosition = 0;
+                        } else {
+                            currentSongPosition = currentSongPosition + 1;
+                        }
+                        songId  = (String) Config.CURRENT_LIST.get(currentSongPosition);
+                        songPath = Config.SING_URL + songId;
+
+                        sendInt = 2;
+                        playThread = new PlayThread();
+                        playThread.start();
+                    }
+                }
 
             }
         }

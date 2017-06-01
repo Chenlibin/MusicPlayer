@@ -1,6 +1,7 @@
 package com.example.android.task4.activity;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,7 @@ import com.example.android.task4.fragment.FirstFragment;
 import com.example.android.task4.fragment.MyMusicFragment;
 import com.example.android.task4.fragment.NearbyFragment;
 import com.example.android.task4.service.MyBindService;
+import com.example.android.task4.utils.MySQLite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,10 @@ public class MainActivity extends FragmentActivity{
     //启动服务
     private Intent serviceIntent;
 
+    //数据库
+    private MySQLite mySQLite;
+    public static SQLiteDatabase db;
+
     //关闭软件
     private long mExitTime;
 
@@ -40,6 +46,9 @@ public class MainActivity extends FragmentActivity{
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
 
+        //创建“喜欢”这个数据库
+        mySQLite = new MySQLite(this,"likeList.db",null,1);
+        db = mySQLite.getWritableDatabase();
 
         //启动服务
         serviceIntent = new Intent(this, MyBindService.class);
@@ -47,7 +56,7 @@ public class MainActivity extends FragmentActivity{
 
         List<Fragment> list = new ArrayList<Fragment>();
 
-        list.add(new FirstFragment(this));
+        list.add(new FirstFragment());
         list.add(new MyMusicFragment());
         list.add(new NearbyFragment());
 

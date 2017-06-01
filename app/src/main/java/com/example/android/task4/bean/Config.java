@@ -81,4 +81,11 @@ public class Config {
     public static final String DB_SING_NAME = "sing";
     public static final String DB_DOWNLOAD_MUSIC = "download_music";
 
+    /**
+    * 播放列表
+    * */
+
+    public static List CURRENT_LIST = null;
+
+
 }

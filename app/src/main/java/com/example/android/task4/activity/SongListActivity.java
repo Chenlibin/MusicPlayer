@@ -51,7 +51,7 @@ public class SongListActivity extends Activity {
     List<Sing> list = null;
 
     //id的集合
-    public static List idList;
+//    public List idList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,43 +86,38 @@ public class SongListActivity extends Activity {
 
     //主线程上，更新数据
     Handler main = new Handler(){
-
         @Override
         public void handleMessage(Message msg) {
-
             switch (msg.what){
                 case 11:
                     if (list != null) {
                         SongListAdapter adapter = new SongListAdapter(SongListActivity.this,list);
                         songListView.setAdapter(adapter);
 
-                        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                            @Override
+//                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                                idList = new ArrayList();
-                                for (int i = 0; i < list.size(); i++) {
-                                    String idOfSong = list.get(i).getSongid();
-                                    idList.add(i,idOfSong);
-                                }
-
-                                Sing sing = list.get(position);
-
-                                String songId = sing.getSongid();
-
-                                Intent intent = new Intent();
-                                intent.putExtra("songId",songId);
-                                intent.putExtra("position",position);
-                                intent.setClass(SongListActivity.this,PlayShowActivity.class);
-                                startActivity(intent);
-                            }
-                        });
-
-
+//                                Config.CURRENT_LIST = new ArrayList();
+//                                for (int i = 0; i < list.size(); i++) {
+//                                    String idOfSong = list.get(i).getSongid();
+//                                    Config.CURRENT_LIST.add(i,idOfSong);
+//                                }
+//
+//                                Sing sing = list.get(position);
+//
+//                                String songId = sing.getSongid();
+//
+//                                Intent intent = new Intent();
+//                                intent.putExtra("songId",songId);
+//                                intent.putExtra("position",position);
+//                                intent.setClass(SongListActivity.this,PlayShowActivity.class);
+//                                startActivity(intent);
+//                            }
+//                        });
                     }
                     break;
             }
-
             super.handleMessage(msg);
         }
     };
@@ -135,17 +130,14 @@ public class SongListActivity extends Activity {
         @Override
         public void run() {
             Looper.prepare();
-
             songListHandler = new Handler(){
                 @Override
                 public void handleMessage(Message msg) {
-
                     switch (msg.what){
                         case 1:
                             if (songListPath != null) {
                                 int id = 1;
                                 byte[] arr;
-
                                 try {
                                     arr = Http.getData(songListPath);
                                     String json = new String(arr,"utf-8");
@@ -157,13 +149,10 @@ public class SongListActivity extends Activity {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-
                             }
-
                             //返回主线程
                             main.sendEmptyMessage(11);
                             break;
-
                         case 2:
                             Looper.myLooper().quit();
                             break;
@@ -173,12 +162,9 @@ public class SongListActivity extends Activity {
             };
             Looper.loop();
         }
-
         public void sendMessage(){
-
             //启动任务（消息只有标识，立即投递）
             songListHandler.sendEmptyMessage(1);
-
             //结束线程
             songListHandler.sendEmptyMessageDelayed(2,5000);
         }

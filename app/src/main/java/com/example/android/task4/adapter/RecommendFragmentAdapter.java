@@ -49,7 +49,7 @@ public class RecommendFragmentAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View ret;
+        View ret = null;
 
         if (convertView != null) {
             ret = convertView;
@@ -69,8 +69,6 @@ public class RecommendFragmentAdapter extends BaseAdapter {
         SingMessage list = singMessages.get(position);
 
         String reText = list.getReText();
-//        String rePhoto = list.getRePhoto();
-//        String ch_name = list.getCh_name();
 
         //显示图片
         Glide
