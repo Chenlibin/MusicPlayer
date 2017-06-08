@@ -1,27 +1,17 @@
 package com.example.android.task4.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.task4.R;
-import com.example.android.task4.activity.MainActivity;
-import com.example.android.task4.activity.PlayShowActivity;
-import com.example.android.task4.bean.Config;
 import com.example.android.task4.bean.Sing;
-import com.example.android.task4.fragment.BaseFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,17 +23,19 @@ public class MyMusicFragmentAdapter extends BaseAdapter {
     private Context context;
     private List<Sing> list;
 
+    //监听
+    private View.OnClickListener onItemChangeListener;
+
+    //由Activity或者fragment来监听  传递监听
+    public void setOnItemChangeListener(View.OnClickListener onItemChangeListener){
+        this.onItemChangeListener = onItemChangeListener;
+    }
+
     public MyMusicFragmentAdapter(Context context, List<Sing> list) {
         this.context = context;
         this.list = list;
 
     }
-
-    public void refresh(List<Sing> nList){
-        list = nList;
-        notifyDataSetChanged();
-    }
-
     @Override
     public int getCount() {
         int count = 0;
@@ -72,9 +64,11 @@ public class MyMusicFragmentAdapter extends BaseAdapter {
         if (convertView != null) {
             ret = convertView;
         } else {
-            ret = LayoutInflater.from(context).inflate(R.layout.mymusic_view,parent,false);
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            ret = layoutInflater.inflate(R.layout.mymusic_view,parent,false);
         }
 
+        //getTag(),用处是重复利用以下控件
         ViewHolder viewHolder = (ViewHolder) ret.getTag();
 
         if (viewHolder == null) {
@@ -82,44 +76,24 @@ public class MyMusicFragmentAdapter extends BaseAdapter {
             viewHolder.titleTv = (TextView) ret.findViewById(R.id.mymusic_title);
             viewHolder.artistTv = (TextView) ret.findViewById(R.id.mymusic_artist);
             viewHolder.itemLayout = (LinearLayout) ret.findViewById(R.id.mymusic_item);
+            //每个item都要有的监听,由Activity或者fragment来监听
+            viewHolder.itemLayout.setOnClickListener(onItemChangeListener);
             viewHolder.decreaseIB = (ImageButton) ret.findViewById(R.id.mymusic_decreasebutton);
+            viewHolder.decreaseIB.setOnClickListener(onItemChangeListener);
             ret.setTag(viewHolder);
-
         }
 
         Sing sing = list.get(position);
 
-        final String songTitle = sing.getSongTitle();
+        String songTitle = sing.getSongTitle();
         String songArtist = sing.getSongArtist();
-        final String songId = sing.getSongid();
 
         viewHolder.titleTv.setText(songTitle);
         viewHolder.artistTv.setText(songArtist);
 
-        viewHolder.itemLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Config.CURRENT_LIST = new ArrayList();
-                for (int i = 0; i < list.size(); i++) {
-                    String idOfSong = list.get(i).getSongid();
-                    Config.CURRENT_LIST.add(i,idOfSong);
-                }
-
-                Intent intent = new Intent();
-                intent.putExtra("songId",songId);
-                intent.putExtra("position",position);
-                intent.setClass(context,PlayShowActivity.class);
-                context.startActivity(intent);
-            }
-        });
-        viewHolder.decreaseIB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainActivity.db.delete("Like","songId = ?",new String[]{songId});
-                Toast.makeText(context,"已经删除" + songTitle,Toast.LENGTH_SHORT).show();
-            }
-        });
-
+        //给按钮和item设置“标签”传递position
+        viewHolder.decreaseIB.setTag(R.id.mymusic_decreasebutton,position);
+        viewHolder.itemLayout.setTag(R.id.mymusic_item,position);
 
         return ret;
     }

@@ -87,5 +87,11 @@ public class Config {
 
     public static List CURRENT_LIST = null;
 
+    /**
+     *
+     * 歌单列表
+     */
+
+    public static List<Sing> LIKE_LIST = null;
 
 }

@@ -1,23 +1,22 @@
 package com.example.android.task4.activity;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.task4.R;
 import com.example.android.task4.adapter.SongListAdapter;
 import com.example.android.task4.bean.Config;
 import com.example.android.task4.bean.Sing;
-import com.example.android.task4.bean.SingMessage;
 import com.example.android.task4.utils.Http;
 import com.example.android.task4.utils.SongJson;
 
@@ -34,7 +33,7 @@ import java.util.List;
  *
  */
 
-public class SongListActivity extends Activity {
+public class SongListActivity extends Activity implements View.OnClickListener {
 
     //控件
     private ListView songListView;
@@ -43,16 +42,14 @@ public class SongListActivity extends Activity {
     //网址
     private String songListPath;
 
+    private SongListAdapter adapter;
+
     //线程
     private Handler songListHandler;
     private MyThread myThread = null;
 
     //数据
     List<Sing> list = null;
-
-    //id的集合
-//    public List idList;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,30 +88,12 @@ public class SongListActivity extends Activity {
             switch (msg.what){
                 case 11:
                     if (list != null) {
-                        SongListAdapter adapter = new SongListAdapter(SongListActivity.this,list);
+                        adapter = new SongListAdapter(SongListActivity.this,list);
+
+                        adapter.setOnItemChangeListener(SongListActivity.this);
+
+
                         songListView.setAdapter(adapter);
-
-//                        songListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                            @Override
-//                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-//                                Config.CURRENT_LIST = new ArrayList();
-//                                for (int i = 0; i < list.size(); i++) {
-//                                    String idOfSong = list.get(i).getSongid();
-//                                    Config.CURRENT_LIST.add(i,idOfSong);
-//                                }
-//
-//                                Sing sing = list.get(position);
-//
-//                                String songId = sing.getSongid();
-//
-//                                Intent intent = new Intent();
-//                                intent.putExtra("songId",songId);
-//                                intent.putExtra("position",position);
-//                                intent.setClass(SongListActivity.this,PlayShowActivity.class);
-//                                startActivity(intent);
-//                            }
-//                        });
                     }
                     break;
             }
@@ -122,10 +101,58 @@ public class SongListActivity extends Activity {
         }
     };
 
+    @Override
+    public void onClick(View v) {
+
+        int id = v.getId();
+        switch (id){
+            case R.id.songlist_item:
+                Config.CURRENT_LIST = new ArrayList();
+                for (int i = 0; i < list.size(); i++) {
+                    String idOfSong = list.get(i).getSongid();
+                    Config.CURRENT_LIST.add(i,idOfSong);
+                }
+
+                Object itemTag = v.getTag(R.id.songlist_item);
+                int itemPosition = (int) itemTag;
+
+                Sing itemSing = list.get(itemPosition);
+
+                String songId = itemSing.getSongid();
+
+                Intent intent = new Intent();
+                intent.putExtra("songId",songId);
+                intent.putExtra("position",itemPosition);
+                intent.setClass(SongListActivity.this,PlayShowActivity.class);
+                startActivity(intent);
+
+                break;
+            case R.id.songlist_likebutton:
+
+                Object buttonTag = v.getTag(R.id.songlist_likebutton);
+                int buttonPosition = (int) buttonTag;
+
+                Toast.makeText(this, "添加到我喜欢的歌单" + list.get(buttonPosition).getSongTitle(), Toast.LENGTH_SHORT).show();
+
+                String buttonSongId = list.get(buttonPosition).getSongid();
+                String buttonSongTitle = list.get(buttonPosition).getSongTitle();
+                String buttonSongArtist = list.get(buttonPosition).getSongArtist();
+
+                ContentValues values = new ContentValues();
+                values.put("songId",buttonSongId);
+                values.put("songTitle",buttonSongTitle);
+                values.put("songArtist",buttonSongArtist);
+                MainActivity.db.insert("Like",null,values);
+//                Log.e("likebutton",position + "");
+                Config.LIKE_LIST.add(list.get(buttonPosition));
+
+                break;
+        }
+
+    }
 
 
-
-    //新线程用于获得网络数据并进行json解析
+    //此线程用于获得网络数据并进行json解析
     private class MyThread extends Thread{
         @Override
         public void run() {
@@ -169,4 +196,11 @@ public class SongListActivity extends Activity {
             songListHandler.sendEmptyMessageDelayed(2,5000);
         }
     }
+
+
+
+
+
+
+
 }

@@ -3,6 +3,7 @@ package com.example.android.task4.adapter;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,13 @@ public class SongListAdapter extends BaseAdapter {
 
     private Context context;
     private List<Sing> list;
+
+    //到fragment监听
+    private View.OnClickListener onItemChangeListener;
+
+    public void setOnItemChangeListener(View.OnClickListener onItemChangeListener){
+        this.onItemChangeListener = onItemChangeListener;
+    }
 
     public SongListAdapter(Context context, List<Sing> list) {
         this.context = context;
@@ -65,7 +73,8 @@ public class SongListAdapter extends BaseAdapter {
         if (convertView != null) {
             ret = convertView;
         }else {
-            ret = LayoutInflater.from(context).inflate(R.layout.songlist_view,parent,false);
+            LayoutInflater inflater = LayoutInflater.from(context);
+            ret = inflater.inflate(R.layout.songlist_view,parent,false);
         }
 
         ViewHolder viewHolder = (ViewHolder) ret.getTag();
@@ -75,7 +84,9 @@ public class SongListAdapter extends BaseAdapter {
             viewHolder.songTitleTv = (TextView) ret.findViewById(R.id.songlist_title);
             viewHolder.songArtistTv = (TextView) ret.findViewById(R.id.songlist_artist);
             viewHolder.itemLayout = (LinearLayout) ret.findViewById(R.id.songlist_item);
+            viewHolder.itemLayout.setOnClickListener(onItemChangeListener);
             viewHolder.likeButton = (ImageButton) ret.findViewById(R.id.songlist_likebutton);
+            viewHolder.likeButton.setOnClickListener(onItemChangeListener);
             ret.setTag(viewHolder);
         }
 
@@ -87,37 +98,8 @@ public class SongListAdapter extends BaseAdapter {
         viewHolder.songTitleTv.setText(songTitle);
         viewHolder.songArtistTv.setText(songArtist);
 
-        viewHolder.itemLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Config.CURRENT_LIST = new ArrayList();
-                for (int i = 0; i < list.size(); i++) {
-                    String idOfSong = list.get(i).getSongid();
-                    Config.CURRENT_LIST.add(i,idOfSong);
-                }
-
-                String songId = sing.getSongid();
-
-                Intent intent = new Intent();
-                intent.putExtra("songId",songId);
-                intent.putExtra("position",position);
-                intent.setClass(context,PlayShowActivity.class);
-                context.startActivity(intent);
-            }
-        });
-
-        viewHolder.likeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(context, "添加到我喜欢的歌单" + list.get(position).getSongTitle(), Toast.LENGTH_SHORT).show();
-                ContentValues values = new ContentValues();
-                values.put("songId",list.get(position).getSongid());
-                values.put("songTitle",list.get(position).getSongTitle());
-                values.put("songArtist",list.get(position).getSongArtist());
-                MainActivity.db.insert("Like",null,values);
-                Log.e("likebutton",position + "");
-            }
-        });
+        viewHolder.itemLayout.setTag(R.id.songlist_item,position);
+        viewHolder.likeButton.setTag(R.id.songlist_likebutton,position);
 
         return ret;
     }
