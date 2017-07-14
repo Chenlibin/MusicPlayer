@@ -33,10 +33,6 @@ public class MainActivity extends FragmentActivity{
     //启动服务
     private Intent serviceIntent;
 
-    //数据库
-    private MySQLite mySQLite;
-    public static SQLiteDatabase db;
-
     //关闭软件
     private long mExitTime;
 
@@ -46,9 +42,9 @@ public class MainActivity extends FragmentActivity{
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
 
-        //创建“喜欢”这个数据库
-        mySQLite = new MySQLite(this,"likeList.db",null,1);
-        db = mySQLite.getWritableDatabase();
+//        //创建“喜欢”这个数据库
+//        mySQLite = new MySQLite(this,"likeList.db",null,1);
+//        db = mySQLite.getWritableDatabase();
 
         //启动服务
         serviceIntent = new Intent(this, MyBindService.class);
@@ -67,9 +63,6 @@ public class MainActivity extends FragmentActivity{
         mainViewPager.setAdapter(adapter);
 
         mainTabLayout.setupWithViewPager(mainViewPager);
-
-
-
     }
 
 
