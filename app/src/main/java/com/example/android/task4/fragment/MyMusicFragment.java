@@ -1,33 +1,23 @@
 package com.example.android.task4.fragment;
 
-import android.content.ContentUris;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.ListViewAutoScrollHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.task4.R;
-import com.example.android.task4.activity.MainActivity;
 import com.example.android.task4.activity.PlayShowActivity;
 import com.example.android.task4.adapter.MyMusicFragmentAdapter;
 import com.example.android.task4.bean.Config;
 import com.example.android.task4.bean.Sing;
+import com.example.android.task4.utils.SQLBaseTool;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import static android.R.id.background;
-import static android.R.id.list;
-import static android.R.id.switchInputMethod;
 
 /**
  * Created by Administrator on 2016/8/15 0015.
@@ -39,6 +29,8 @@ public class MyMusicFragment extends BaseFragment implements View.OnClickListene
 
     private MyMusicFragmentAdapter adapter;
 
+    private SQLBaseTool sqlBaseTool;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,36 +39,18 @@ public class MyMusicFragment extends BaseFragment implements View.OnClickListene
         likeListView = (ListView) ret.findViewById(R.id.mymusic_like_list);
         textView = (TextView) ret.findViewById(R.id.mymusic_textView);
 
-        //查询数据库中所有数据   后面是查询条件  都是null表示全部
-        Cursor cursor = MainActivity.db.query("Like",null,null,null,null,null,null);
+        sqlBaseTool = new SQLBaseTool(getActivity());
 
-        Config.LIKE_LIST = new ArrayList<Sing>();
+        sqlBaseTool.getSongs();
 
-        if (cursor != null) {
-            if (cursor.moveToFirst()){
-                do {
-                    Sing sing = new Sing();
-                    String songId = cursor.getString(cursor.getColumnIndex("songId"));
-                    String songTitle = cursor.getString(cursor.getColumnIndex("songTitle"));
-                    String songArtist = cursor.getString(cursor.getColumnIndex("songArtist"));
-
-                    sing.setSongid(songId);
-                    sing.setSongTitle(songTitle);
-                    sing.setSongArtist(songArtist);
-
-                    Config.LIKE_LIST.add(sing);
-
-                }while (cursor.moveToNext());
-            }
-            cursor.close();
+        if (Config.LIKE_LIST != null) {
             adapter = new MyMusicFragmentAdapter(getActivity(),Config.LIKE_LIST);
 
             adapter.setOnItemChangeListener(this);
 
             likeListView.setAdapter(adapter);
-        } else {
-            textView.setText("还没有歌单，请自行添加");
         }
+
         return ret;
     }
 
@@ -128,11 +102,11 @@ public class MyMusicFragment extends BaseFragment implements View.OnClickListene
                     String songTitle_decrease = sing1.getSongTitle();
 
                     //删除数据库中的数据
-                    MainActivity.db.delete("Like","songId = ?",new String[]{songId_decrease});
+                   sqlBaseTool.delete(songId_decrease);
+//                    MainActivity.db.delete("Like","songId = ?",new String[]{songId_decrease});
                     Toast.makeText(getActivity(),"已经删除" + songTitle_decrease,Toast.LENGTH_SHORT).show();
                     //从List中删除  使显示的时候可以马上看到效果
                     Config.LIKE_LIST.remove(position1);
-
                     // 强制刷新 Adapter，就会自动更新 数量 TextView
                     adapter.notifyDataSetChanged();
                 }

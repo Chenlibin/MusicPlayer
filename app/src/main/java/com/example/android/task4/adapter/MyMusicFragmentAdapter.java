@@ -26,6 +26,8 @@ public class MyMusicFragmentAdapter extends BaseAdapter {
     //监听
     private View.OnClickListener onItemChangeListener;
 
+    public MyMusicFragmentAdapter() {    }
+
     //由Activity或者fragment来监听  传递监听
     public void setOnItemChangeListener(View.OnClickListener onItemChangeListener){
         this.onItemChangeListener = onItemChangeListener;

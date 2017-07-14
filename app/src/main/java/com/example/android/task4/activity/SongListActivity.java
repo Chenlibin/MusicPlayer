@@ -14,10 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.task4.R;
+import com.example.android.task4.adapter.MyMusicFragmentAdapter;
 import com.example.android.task4.adapter.SongListAdapter;
 import com.example.android.task4.bean.Config;
 import com.example.android.task4.bean.Sing;
 import com.example.android.task4.utils.Http;
+import com.example.android.task4.utils.SQLBaseTool;
 import com.example.android.task4.utils.SongJson;
 
 import org.json.JSONException;
@@ -92,7 +94,6 @@ public class SongListActivity extends Activity implements View.OnClickListener {
 
                         adapter.setOnItemChangeListener(SongListActivity.this);
 
-
                         songListView.setAdapter(adapter);
                     }
                     break;
@@ -134,17 +135,11 @@ public class SongListActivity extends Activity implements View.OnClickListener {
 
                 Toast.makeText(this, "添加到我喜欢的歌单" + list.get(buttonPosition).getSongTitle(), Toast.LENGTH_SHORT).show();
 
-                String buttonSongId = list.get(buttonPosition).getSongid();
-                String buttonSongTitle = list.get(buttonPosition).getSongTitle();
-                String buttonSongArtist = list.get(buttonPosition).getSongArtist();
+                new SQLBaseTool(this).insert(list,buttonPosition);
+                //只有在歌单有歌曲才能更新出来。。若列表内无歌曲，则不能实时更新
+                MyMusicFragmentAdapter adapter = new MyMusicFragmentAdapter();
+                adapter.notifyDataSetChanged();
 
-                ContentValues values = new ContentValues();
-                values.put("songId",buttonSongId);
-                values.put("songTitle",buttonSongTitle);
-                values.put("songArtist",buttonSongArtist);
-                MainActivity.db.insert("Like",null,values);
-//                Log.e("likebutton",position + "");
-                Config.LIKE_LIST.add(list.get(buttonPosition));
 
                 break;
         }

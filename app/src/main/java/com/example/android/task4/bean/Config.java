@@ -77,7 +77,7 @@ public class Config {
      * 最近播放歌曲列表
      */
 
-    public static final String DB_NAME = "singmessage";
+    public static final String DB_NAME = "like";
     public static final String DB_SING_NAME = "sing";
     public static final String DB_DOWNLOAD_MUSIC = "download_music";
 

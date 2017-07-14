@@ -7,22 +7,20 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.android.task4.bean.Config;
+
 /**
  * Created by Liber on 2017/5/24.
  */
 
 public class MySQLite extends SQLiteOpenHelper {
 
-    public static final String CREATE_LIKE = "create table Like(" + "id integer primary key autoincrement," + " songId String," + "songTitle String," + "songArtist String)";
+//    public static final String CREATE_LIKE = "create table Like(" + "id integer primary key autoincrement," + " songId String," + "songTitle String," + "songArtist String)";
+    public static final String CREATE_LIKE = "create table "+ Config.DB_NAME +"(" + "id integer primary key autoincrement," + " songId String," + "songTitle String," + "songArtist String)";
 
-
-
-    public MySQLite(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
-    }
-
-    public MySQLite(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
-        super(context, name, factory, version, errorHandler);
+    public MySQLite(Context context) {
+        //第二个参数:创建一个文件名字是music 第四个是版本号。。用于更新
+        super(context, "music.db", null, 1);
     }
 
     @Override
@@ -33,6 +31,9 @@ public class MySQLite extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //版本更新
+        if (newVersion > oldVersion){
+        }
 
     }
 }
